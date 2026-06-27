@@ -22,22 +22,31 @@
       <a href="../team/sponsors.html">Sponsors</a>
       <a href="../team/media.html">Media</a>
       <a href="../team/contact.html">Contact</a>
-      <a href="login.html" class="active">Tools</a>
+      <a href="index.html">Tools</a>
     </nav>
   </header>
 
-  <main>
-    <section class="page-header">
-      <h1>Team tools login</h1>
-      <p>Team Tiger members can log in here to access scouting and inventory tools.</p>
-    </section>
+  <main class="login-page">
+    <section class="login-card">
+      <h1>Team tools access</h1>
+      <p>Team Tiger 9551 members can unlock scouting and inventory tools with the shared team password.</p>
 
-    <section class="card">
-      <h2>Enter team password</h2>
-      <p>This password is shared privately with Team Tiger 9551 members.</p>
-      <input type="password" id="tools-password" placeholder="Team tools password" />
-      <button class="btn small" onclick="toolsLogin()">Unlock tools</button>
-      <p id="tools-error" class="muted"></p>
+      <div class="login-form-group">
+        <label for="tools-password">Team tools password</label>
+        <input
+          type="password"
+          id="tools-password"
+          class="login-input"
+          placeholder="Enter password"
+        />
+      </div>
+
+      <div class="login-actions">
+        <button class="btn small" onclick="toolsLogin()">Unlock tools</button>
+        <span class="login-meta">Shared privately within Team Tiger.</span>
+      </div>
+
+      <p id="tools-error" class="muted" style="margin-top:8px;"></p>
     </section>
   </main>
 
@@ -46,17 +55,15 @@
   </footer>
 
   <script>
-    const TEAM_TOOLS_PASSWORD = "StemHarvest"; // change this to your real password
+    const TEAM_TOOLS_PASSWORD = "StemHarvest"; // change to your real password
 
     function toolsLogin() {
       const input = document.getElementById('tools-password').value;
       const error = document.getElementById('tools-error');
       if (input === TEAM_TOOLS_PASSWORD) {
-        // mark this browser as logged in
         localStorage.setItem('teamTigerToolsAccess', 'true');
         error.textContent = "";
-        // send them to tools home or scouting app
-        window.location.href = "scouting/index.html";
+        window.location.href = "index.html";
       } else {
         error.textContent = "Incorrect password.";
       }

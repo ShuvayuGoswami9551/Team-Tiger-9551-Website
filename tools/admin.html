@@ -7,58 +7,62 @@
   <link rel="stylesheet" href="../assets/styles.css" />
 </head>
 <body>
-  <header class="site-header">
-    <div class="brand">
+<header class="site-header">
+  <div class="brand">
+    <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+    <div class="brand-text">
       <span class="team-number">Team Tiger 9551</span>
       <span class="team-name">Team Tiger</span>
     </div>
-    <nav class="main-nav">
-      <a href="../index.html">Home</a>
-      <a href="../team/about.html">Team</a>
-      <a href="../team/robots.html">Robots</a>
-      <a href="../team/sponsors.html">Sponsors</a>
-      <a href="../team/media.html">Media</a>
-      <a href="../team/contact.html">Contact</a>
-      <div class="nav-dropdown">
-        <button type="button">Tools ▾</button>
-        <div class="nav-dropdown-menu">
-          <a href="scouting/index.html">Scouting</a>
-          <a href="inventory/index.html">Inventory</a>
-          <a href="admin.html" class="active">Admin</a>
-        </div>
-      </div>
-    </nav>
-  </header>
+  </div>
+  <nav class="main-nav">
+    <a href="../../index.html">Home</a>
+    <a href="../../team/about.html">Team</a>
+    <a href="../../team/robots.html">Robots</a>
+    <a href="../../team/sponsors.html">Sponsors</a>
+    <a href="../../team/media.html">Media</a>
+    <a href="../../team/contact.html">Contact</a>
+    <a href="../index.html">Tools</a>
+  </nav>
+</header>
+  <main class="login-page">
+  <section class="login-card" id="admin-locked">
+    <h1>Admin access</h1>
+    <p>Restricted configuration for Team Tiger 9551 scouting and inventory tools.</p>
 
-  <main>
-    <section class="page-header">
-      <h1>Admin – Team Tiger 9551</h1>
-      <p>Restricted configuration for scouting and inventory tools.</p>
-    </section>
+    <div class="login-form-group">
+      <label for="admin-password">Admin password</label>
+      <input
+        type="password"
+        id="admin-password"
+        class="login-input"
+        placeholder="Enter admin password"
+      />
+    </div>
 
-    <section class="card" id="admin-locked">
-      <h2>Login</h2>
-      <p>Enter the admin password to access Team Tiger’s configuration panel.</p>
-      <input type="password" id="admin-password" placeholder="Admin password" />
-      <button class="btn small" onclick="adminLogin()">Unlock</button>
-      <p id="admin-error" class="muted"></p>
-    </section>
+    <div class="login-actions">
+      <button class="btn small" onclick="adminLogin()">Unlock admin panel</button>
+      <span class="login-meta">For mentors and selected student leaders.</span>
+    </div>
 
-    <section class="card" id="admin-panel" style="display:none;">
-      <h2>Settings</h2>
-      <p>wire this to Apps Script</p>
-      <div>
-        <label for="event-key">Default event key (The Blue Alliance)</label><br />
-        <input id="event-key" type="text" placeholder="e.g., 2026xxxx" />
-      </div>
-      <div style="margin-top:10px;">
-        <button class="btn small">Save settings</button>
-      </div>
-    </section>
+    <p id="admin-error" class="muted" style="margin-top:8px;"></p>
+  </section>
+
+  <section class="login-card" id="admin-panel" style="display:none; max-width:520px;">
+    <h1>Admin settings</h1>
+    <p>Adjust Team Tiger 9551 tool configuration here.</p>
+    <div class="login-form-group">
+      <label for="event-key">Default event key (The Blue Alliance)</label>
+      <input id="event-key" type="text" class="login-input" placeholder="e.g., 2026xxxx" />
+    </div>
+    <div class="login-actions">
+      <button class="btn small">Save settings</button>
+      <span class="login-meta">Wire this later to your backend or Apps Script.</span>
+    </div>
+  </section>
   </main>
-
   <footer class="site-footer">
-    <p>© 20XX Team Tiger 9551</p>
+    <p>© 2024 Team Tiger 9551</p>
   </footer>
   <script>
     const ADMIN_PASSWORD = "CusterHall"; // set your own password

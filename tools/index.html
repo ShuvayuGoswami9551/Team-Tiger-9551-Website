@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Team Tools – Team Tiger 9551</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../assets/styles.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="brand">
+    <img src="../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+    <div class="brand-text">
+      <span class="team-number">Team Tiger 9551</span>
+      <span class="team-name">Team Tiger</span>
+    </div>
+  </div>
+  <nav class="main-nav">
+    <a href="../index.html">Home</a>
+    <a href="../team/about.html">Team</a>
+    <a href="../team/robots.html">Robots</a>
+    <a href="../team/sponsors.html">Sponsors</a>
+    <a href="../team/media.html">Media</a>
+    <a href="../team/contact.html">Contact</a>
+    <a href="index.html" class="active">Tools</a>
+  </nav>
+</header>
+
+  <main>
+    <section class="page-header">
+      <h1>Team Tiger tools</h1>
+      <p>Team Tiger 9551 members can access scouting and inventory tools from this dashboard.</p>
+    </section>
+    <section style="margin-bottom: 12px; display:flex; justify-content:flex-end;">
+        <button class="btn small secondary" onclick="logoutTools()">Log out</button>
+    </section>
+    <section class="tools-grid">
+      <article class="tools-card">
+        <h2>Scouting portal</h2>
+        <p>Open the match scouting web app to record and review robot performance during events.</p>
+        <div class="tools-meta">
+          <span>Offline‑first, syncs data when online.</span>
+        </div>
+        <a class="btn small" href="scouting/index.html">Open scouting</a>
+      </article>
+
+      <article class="tools-card">
+        <h2>Inventory tracking</h2>
+        <p>Manage Team Tiger’s parts, quantities, and locations in the shop.</p>
+        <div class="tools-meta">
+          <span>Backed by Google Sheets for easy updates.</span>
+        </div>
+        <a class="btn small" href="inventory/index.html">Open inventory</a>
+      </article>
+
+      <article class="tools-card">
+        <h2>Admin panel</h2>
+        <p>Adjust event settings and other configuration for mentors and student leaders.</p>
+        <div class="tools-meta">
+          <span>Admin password required.</span>
+        </div>
+        <a class="btn small secondary" href="admin.html">Open admin</a>
+      </article>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2024 Team Tiger 9551</p>
+  </footer>
+
+    <script>
+        // Require tools login
+        if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        function logoutTools() {
+            // Remove just the Team Tiger tools access flag
+            localStorage.removeItem('teamTigerToolsAccess'); // or localStorage.clear() to wipe all keys[web:100][web:101][web:102]
+            window.location.href = '../index.html'; // back to public home
+        }
+    </script>
+</body>
+</html>
