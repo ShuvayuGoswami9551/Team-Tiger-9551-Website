@@ -476,6 +476,15 @@ textarea {
   min-height: 120px;
 }
 
+/* Inventory */
+
+.inventory-image {
+  height: 40px;
+  width: auto;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
 /* Responsive tweaks */
 
 @media (max-width: 640px) {

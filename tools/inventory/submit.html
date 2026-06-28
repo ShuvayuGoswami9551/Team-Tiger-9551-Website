@@ -14,6 +14,7 @@
       </div>
       <div class="brand-text">
         <span class="team-number">Team Tiger 9551</span>
+        <span class="team-name">Team Tiger</span>
       </div>
     </div>
     <nav class="main-nav">
@@ -30,7 +31,7 @@
   <main class="login-page">
     <section class="login-card">
       <h1>Submit new inventory item</h1>
-      <p>Add a part or material to Team Tiger’s inventory. Admins can later update cost and minimum stock.</p>
+      <p>Add a part or material to Team Tiger’s inventory.</p>
 
       <div class="login-form-group">
         <label for="item-name">Item name</label>
@@ -86,7 +87,7 @@
       window.location.href = '../login.html';
     }
 
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxfGXBot1C4Z1_TA8fFn3sdmRxelDHZeWEbmqtsGorq7NoPVUzJnQyamzFmZ8ZuBsEYWg/exec'; // same as index.html
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxeAMAUq6xLwskc8DRRcrbP6JSqgFoJkn5zcxKwKVX4xhNB0q5iUyZc4gn20V4fVhNE0A/exec';
 
     async function submitItem() {
       const statusEl = document.getElementById('submit-status');
@@ -114,6 +115,11 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
+
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+
         const json = await res.json();
 
         if (json.success) {
@@ -131,7 +137,7 @@
         }
       } catch (err) {
         console.error(err);
-        statusEl.textContent = 'Error submitting item.';
+        statusEl.textContent = 'Error submitting item: ' + err.message;
       }
     }
   </script>
