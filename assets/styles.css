@@ -485,6 +485,15 @@ textarea {
   object-fit: contain;
 }
 
+.inventory-qty-low {
+  color: #ff6961; /* soft red */
+  font-weight: 600;
+}
+
+.inventory-qty-ok {
+  color: var(--text);
+}
+
 /* Responsive tweaks */
 
 @media (max-width: 640px) {

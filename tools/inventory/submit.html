@@ -69,7 +69,7 @@
       </div>
 
       <div class="login-actions">
-        <button class="btn small" onclick="submitItem()">Submit item</button>
+        <button id="submit-btn" class="btn small" onclick="submitItem()">Submit item</button>
         <span class="login-meta">Photos from phones can be uploaded and linked via URL.</span>
       </div>
 
@@ -87,64 +87,67 @@
       window.location.href = '../login.html';
     }
 
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyAMKHVJVmn-qHwaKnKLR3gpc1nfcg--u1TNIzw6qvJGtqWMT71M4YB0CZeDFtTSbY2gg/exec';
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyAMKHVJVmn-qHwaKnKLR3gpc1nfcg--u1TNIzw6qvJGtqWMT71M4YB0CZeDFtTSbY2gg/exec'; // same as index.html
 
     async function submitItem() {
-        const statusEl = document.getElementById('submit-status');
+      const statusEl = document.getElementById('submit-status');
+      const btn = document.getElementById('submit-btn');
 
-        const data = {
-            itemName: document.getElementById('item-name').value,
-            category: document.getElementById('category').value,
-            partNumber: document.getElementById('part-number').value,
-            quantityOnHand: Number(document.getElementById('quantity').value || 0),
-            location: document.getElementById('location').value,
-            imageUrl: document.getElementById('image-url').value,
-            notes: document.getElementById('notes').value
-        };
+      const data = {
+        itemName: document.getElementById('item-name').value,
+        category: document.getElementById('category').value,
+        partNumber: document.getElementById('part-number').value,
+        quantityOnHand: Number(document.getElementById('quantity').value || 0),
+        location: document.getElementById('location').value,
+        imageUrl: document.getElementById('image-url').value,
+        notes: document.getElementById('notes').value
+      };
 
-        if (!data.itemName) {
-            statusEl.textContent = 'Item name is required.';
-            return;
-        }
+      if (!data.itemName) {
+        statusEl.textContent = 'Item name is required.';
+        return;
+      }
 
-        statusEl.textContent = 'Submitting item...';
+      statusEl.textContent = 'Submitting item...';
+      btn.disabled = true;
 
-        try {
-            const params = new URLSearchParams({
-            mode: 'add',
-            itemName: data.itemName,
-            category: data.category,
-            partNumber: data.partNumber,
-            quantityOnHand: String(data.quantityOnHand),
-            location: data.location,
-            imageUrl: data.imageUrl,
-            notes: data.notes
+      try {
+        const params = new URLSearchParams({
+          mode: 'add',
+          itemName: data.itemName,
+          category: data.category,
+          partNumber: data.partNumber,
+          quantityOnHand: String(data.quantityOnHand),
+          location: data.location,
+          imageUrl: data.imageUrl,
+          notes: data.notes
         });
 
-            const res = await fetch(BACKEND_URL + '?' + params.toString());
-            if (!res.ok) {
-            throw new Error('HTTP ' + res.status);
-            }
-
-            const json = await res.json();
-
-            if (json.success) {
-            statusEl.textContent = 'Item submitted successfully.';
-            // optional: clear form
-            document.getElementById('item-name').value = '';
-            document.getElementById('category').value = '';
-            document.getElementById('part-number').value = '';
-            document.getElementById('quantity').value = '0';
-            document.getElementById('location').value = '';
-            document.getElementById('image-url').value = '';
-            document.getElementById('notes').value = '';
-            } else {
-            statusEl.textContent = 'Error: ' + (json.error || 'Unknown error');
-            }
-        } catch (err) {
-            console.error('Submit error:', err);
-            statusEl.textContent = 'Error submitting item: ' + err.message;
+        const res = await fetch(BACKEND_URL + '?' + params.toString());
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
         }
+
+        const json = await res.json();
+
+        if (json.success) {
+          statusEl.textContent = 'Item submitted successfully.';
+          document.getElementById('item-name').value = '';
+          document.getElementById('category').value = '';
+          document.getElementById('part-number').value = '';
+          document.getElementById('quantity').value = '0';
+          document.getElementById('location').value = '';
+          document.getElementById('image-url').value = '';
+          document.getElementById('notes').value = '';
+        } else {
+          statusEl.textContent = 'Error: ' + (json.error || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('Submit error:', err);
+        statusEl.textContent = 'Error submitting item: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
     }
   </script>
 </body>

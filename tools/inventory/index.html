@@ -31,12 +31,18 @@
   <main>
     <section class="page-header">
       <h1>Inventory – Team Tiger 9551</h1>
-      <p>All parts and materials currently tracked in Team Tiger’s inventory.</p>
+      <p>Browse all parts and materials currently tracked in Team Tiger’s inventory.</p>
     </section>
 
-    <section style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-      <button class="btn small secondary" onclick="logoutTools()">Log out</button>
-      <a class="btn small" href="submit.html">Submit new item</a>
+    <section style="margin-bottom: 12px; display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center;">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="btn small secondary" onclick="logoutTools()">Log out</button>
+        <a class="btn small" href="submit.html">Submit new item</a>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <label for="inventory-search" class="login-meta" style="margin:0;">Search</label>
+        <input id="inventory-search" type="text" class="login-input" style="max-width:220px;" placeholder="Search by name or category" />
+      </div>
     </section>
 
     <section class="card">
@@ -77,7 +83,9 @@
       window.location.href = '../../index.html';
     }
 
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyAMKHVJVmn-qHwaKnKLR3gpc1nfcg--u1TNIzw6qvJGtqWMT71M4YB0CZeDFtTSbY2gg/exec';
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyAMKHVJVmn-qHwaKnKLR3gpc1nfcg--u1TNIzw6qvJGtqWMT71M4YB0CZeDFtTSbY2gg/exec'; // same URL as submit.html
+
+    let inventoryItems = [];
 
     async function loadInventory() {
       const statusEl = document.getElementById('inventory-status');
@@ -90,43 +98,76 @@
           throw new Error('HTTP ' + res.status);
         }
         const data = await res.json();
-        const items = data.items || [];
+        inventoryItems = data.items || [];
 
-        if (!items.length) {
+        if (!inventoryItems.length) {
           statusEl.textContent = 'No inventory items found yet.';
           bodyEl.innerHTML = '';
           return;
         }
 
-        const rows = items.map(item => {
-          const imgUrl = item['Image URL'] || '';
-          const imgHtml = imgUrl
-            ? `<img src="${imgUrl}" alt="${item['Item name'] || 'Part image'}" class="inventory-image" />`
-            : '';
-
-          return `
-            <tr>
-              <td>${imgHtml}</td>
-              <td>${item['Item name'] || ''}</td>
-              <td>${item['Category'] || ''}</td>
-              <td>${item['Part number / SKU'] || ''}</td>
-              <td>${item['Quantity on hand'] || ''}</td>
-              <td>${item['Location'] || ''}</td>
-              <td>${item['Minimum stock'] || ''}</td>
-              <td>${item['Supplier'] || ''}</td>
-            </tr>
-          `;
-        }).join('');
-
-        bodyEl.innerHTML = rows;
-        statusEl.textContent = `Loaded ${items.length} items.`;
+        renderInventoryTable(inventoryItems);
+        statusEl.textContent = `Loaded ${inventoryItems.length} items.`;
       } catch (err) {
         console.error(err);
         statusEl.textContent = 'Error loading inventory: ' + err.message;
       }
     }
 
-    document.addEventListener('DOMContentLoaded', loadInventory);
+    function renderInventoryTable(items) {
+      const bodyEl = document.getElementById('inventory-body');
+      const rows = items.map(item => {
+        const imgUrl = item['Image URL'] || '';
+        const imgHtml = imgUrl
+          ? `<img src="${imgUrl}" alt="${item['Item name'] || 'Part image'}" class="inventory-image" />`
+          : '';
+
+        const qty = Number(item['Quantity on hand'] || 0);
+        const min = Number(item['Minimum stock'] || 0);
+        const low = min > 0 && qty <= min;
+
+        const qtyClass = low ? 'inventory-qty-low' : 'inventory-qty-ok';
+
+        return `
+          <tr>
+            <td>${imgHtml}</td>
+            <td><strong>${item['Item name'] || ''}</strong></td>
+            <td>${item['Category'] || ''}</td>
+            <td>${item['Part number / SKU'] || ''}</td>
+            <td class="${qtyClass}">${qty}</td>
+            <td>${item['Location'] || ''}</td>
+            <td>${item['Minimum stock'] || ''}</td>
+            <td>${item['Supplier'] || ''}</td>
+          </tr>
+        `;
+      }).join('');
+
+      bodyEl.innerHTML = rows;
+    }
+
+    function setupSearch() {
+      const input = document.getElementById('inventory-search');
+      input.addEventListener('input', () => {
+        const term = input.value.trim().toLowerCase();
+        if (!term) {
+          renderInventoryTable(inventoryItems);
+          return;
+        }
+
+        const filtered = inventoryItems.filter(item => {
+          const name = String(item['Item name'] || '').toLowerCase();
+          const category = String(item['Category'] || '').toLowerCase();
+          return name.includes(term) || category.includes(term);
+        });
+
+        renderInventoryTable(filtered);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadInventory();
+      setupSearch();
+    });
   </script>
 </body>
 </html>
