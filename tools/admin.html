@@ -60,24 +60,56 @@
       window.location.href = 'login.html';
     }
 
-    function saveCurrentEvent() {
-      const input = document.getElementById('event-name-admin');
-      const status = document.getElementById('event-save-status');
-      const value = input.value.trim();
+    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwFS1CGhblptHvojBPR4ILqIUMHhG_svs7dyp9d0msJ5cNHomHN5-PPHyHdv8sRmgBnfw/exec';
 
-      if (!value) {
+    async function saveCurrentEvent() {
+    const input = document.getElementById('event-name-admin');
+    const status = document.getElementById('event-save-status');
+    const value = input.value.trim();
+
+    if (!value) {
         status.textContent = 'Please enter an event name.';
         return;
-      }
-
-      localStorage.setItem('teamTigerCurrentEvent', value);
-      status.textContent = 'Event name saved: ' + value;
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const existing = localStorage.getItem('teamTigerCurrentEvent');
-      if (existing) {
-        document.getElementById('event-name-admin').value = existing;
+    try {
+        const params = new URLSearchParams({
+        mode: 'setEvent',
+        eventKey: value
+        });
+          const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+          const json = await res.json();
+        if (json.success) {
+          status.textContent = 'Event key saved: ' + json.eventKey;
+        } else {
+          status.textContent = 'Error: ' + (json.error || 'Unknown error');
+        }
+    } catch (err) {
+        console.error(err);
+        status.textContent = 'Error saving event key: ' + err.message;
+      }
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+      const input = document.getElementById('event-name-admin');
+      const status = document.getElementById('event-save-status');
+
+      try {
+        const res = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
+        if (!res.ok) {
+        throw new Error('HTTP ' + res.status);
+        }
+        const json = await res.json();
+        input.value = json.eventKey || '';
+        if (json.eventKey) {
+        status.textContent = 'Current event key: ' + json.eventKey;
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = 'Error loading current event key.';
       }
     });
   </script>

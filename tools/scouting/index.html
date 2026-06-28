@@ -174,88 +174,107 @@
       window.location.href = '../../index.html';
     }
 
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwc6K94yyOorZP40hnItrUmncjofEWeNrEj0iESQizecihNZSvzHMH3VKYWIVOpb1yZrQ/exec';
+    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwFS1CGhblptHvojBPR4ILqIUMHhG_svs7dyp9d0msJ5cNHomHN5-PPHyHdv8sRmgBnfw/exec';
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const eventValue = localStorage.getItem('teamTigerCurrentEvent');
-      const display = document.getElementById('event-name-display');
-      display.textContent = eventValue || '(no event set)';
+document.addEventListener('DOMContentLoaded', async () => {
+  const display = document.getElementById('event-name-display');
+
+  try {
+    const res = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
+    if (!res.ok) {
+      throw new Error('HTTP ' + res.status);
+    }
+    const json = await res.json();
+    display.textContent = json.eventKey || '(no event set)';
+  } catch (err) {
+    console.error(err);
+    display.textContent = '(error loading event key)';
+  }
+});
+
+async function submitScoutingEntry() {
+  const status = document.getElementById('save-status');
+  const btn = document.getElementById('scouting-submit-btn');
+
+  // load current event key before submit
+  let eventKey = '';
+  try {
+    const resEvent = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
+    if (resEvent.ok) {
+      const jsonEvent = await resEvent.json();
+      eventKey = jsonEvent.eventKey || '';
+    }
+  } catch (err) {
+    console.error('Error getting event key:', err);
+  }
+
+  const data = {
+    scouterName: document.getElementById('scouter-name').value,
+    eventName: eventKey,
+    matchNumber: document.getElementById('match-number').value,
+    teamNumber: document.getElementById('team-number').value,
+    alliance: document.getElementById('alliance').value,
+    autoStartPos: document.getElementById('auto-start-pos').value,
+    autoPiecesScored: document.getElementById('auto-pieces-scored').value,
+    autoMobility: document.getElementById('auto-mobility').value,
+    autoNotes: document.getElementById('auto-notes').value,
+    teleopPiecesScored: document.getElementById('teleop-pieces-scored').value,
+    defenseLevel: document.getElementById('defense-level').value,
+    endgameResult: document.getElementById('endgame-result').value,
+    teleopNotes: document.getElementById('teleop-notes').value,
+    rating: document.getElementById('rating').value,
+    overallNotes: document.getElementById('overall-notes').value
+  };
+
+  if (!data.scouterName || !data.matchNumber || !data.teamNumber) {
+    status.textContent = 'Please fill in scouter, match, and team number.';
+    return;
+  }
+
+  status.textContent = 'Submitting entry...';
+  btn.disabled = true;
+
+  try {
+    const params = new URLSearchParams({
+      mode: 'add',
+      scouterName: data.scouterName,
+      eventName: data.eventName,
+      matchNumber: data.matchNumber,
+      teamNumber: data.teamNumber,
+      alliance: data.alliance,
+      autoStartPos: data.autoStartPos,
+      autoPiecesScored: data.autoPiecesScored,
+      autoMobility: data.autoMobility,
+      autoNotes: data.autoNotes,
+      teleopPiecesScored: data.teleopPiecesScored,
+      defenseLevel: data.defenseLevel,
+      endgameResult: data.endgameResult,
+      teleopNotes: data.teleopNotes,
+      rating: data.rating,
+      overallNotes: data.overallNotes
     });
 
-    async function submitScoutingEntry() {
-      const status = document.getElementById('save-status');
-      const btn = document.getElementById('scouting-submit-btn');
-
-      const eventValue = localStorage.getItem('teamTigerCurrentEvent') || '';
-
-      const data = {
-        scouterName: document.getElementById('scouter-name').value,
-        eventName: eventValue,
-        matchNumber: document.getElementById('match-number').value,
-        teamNumber: document.getElementById('team-number').value,
-        alliance: document.getElementById('alliance').value,
-        autoStartPos: document.getElementById('auto-start-pos').value,
-        autoPiecesScored: document.getElementById('auto-pieces-scored').value,
-        autoMobility: document.getElementById('auto-mobility').value,
-        autoNotes: document.getElementById('auto-notes').value,
-        teleopPiecesScored: document.getElementById('teleop-pieces-scored').value,
-        defenseLevel: document.getElementById('defense-level').value,
-        endgameResult: document.getElementById('endgame-result').value,
-        teleopNotes: document.getElementById('teleop-notes').value,
-        rating: document.getElementById('rating').value,
-        overallNotes: document.getElementById('overall-notes').value
-      };
-
-      if (!data.scouterName || !data.matchNumber || !data.teamNumber) {
-        status.textContent = 'Please fill in scouter, match, and team number.';
-        return;
-      }
-
-      status.textContent = 'Submitting entry...';
-      btn.disabled = true;
-
-      try {
-        const params = new URLSearchParams({
-          mode: 'add',
-          scouterName: data.scouterName,
-          eventName: data.eventName,
-          matchNumber: data.matchNumber,
-          teamNumber: data.teamNumber,
-          alliance: data.alliance,
-          autoStartPos: data.autoStartPos,
-          autoPiecesScored: data.autoPiecesScored,
-          autoMobility: data.autoMobility,
-          autoNotes: data.autoNotes,
-          teleopPiecesScored: data.teleopPiecesScored,
-          defenseLevel: data.defenseLevel,
-          endgameResult: data.endgameResult,
-          teleopNotes: data.teleopNotes,
-          rating: data.rating,
-          overallNotes: data.overallNotes
-        });
-
-        const res = await fetch(BACKEND_URL + '?' + params.toString());
-        if (!res.ok) {
-          throw new Error('HTTP ' + res.status);
-        }
-
-        const json = await res.json();
-
-        if (json.success) {
-          status.textContent = 'Entry submitted to Google Sheets.';
-          document.getElementById('auto-notes').value = '';
-          document.getElementById('teleop-notes').value = '';
-          document.getElementById('overall-notes').value = '';
-        } else {
-          status.textContent = 'Error: ' + (json.error || 'Unknown error');
-        }
-      } catch (err) {
-        console.error('Scouting submit error:', err);
-        status.textContent = 'Error submitting entry: ' + err.message;
-      } finally {
-        btn.disabled = false;
-      }
+    const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
+    if (!res.ok) {
+      throw new Error('HTTP ' + res.status);
     }
+    const json = await res.json();
+
+    if (json.success) {
+      status.textContent = 'Entry submitted to Google Sheets.';
+      document.getElementById('auto-notes').value = '';
+      document.getElementById('teleop-notes').value = '';
+      document.getElementById('overall-notes').value = '';
+    } else {
+      status.textContent = 'Error: ' + (json.error || 'Unknown error');
+    }
+  } catch (err) {
+    console.error('Scouting submit error:', err);
+    status.textContent = 'Error submitting entry: ' + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
   </script>
 </body>
 </html>
