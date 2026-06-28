@@ -476,6 +476,53 @@ textarea {
   min-height: 120px;
 }
 
+/* Tools Nav Bar */
+
+.tools-nav {
+  position: sticky; /* or fixed if you prefer */
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #111827; /* dark gray/near black */
+  color: #f9fafb; /* light text */
+  border-bottom: 1px solid #1f2937;
+}
+
+.tools-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tools-nav-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tools-nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tools-nav-link {
+  font-size: 14px;
+  color: #e5e7eb;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+
+.tools-nav-link:hover {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #ffffff;
+}
+
 /* Inventory */
 
 .inventory-image {
