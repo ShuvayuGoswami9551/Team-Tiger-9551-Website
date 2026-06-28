@@ -38,14 +38,24 @@
         <button class="btn small secondary" onclick="logoutTools()">Log out</button>
         <a class="btn small" href="index.html">New scouting entry</a>
       </div>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <label for="scouting-search" class="login-meta" style="margin:0;">Search</label>
+      <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+        <label class="login-meta" style="margin:0;">Filter by</label>
+        <select id="scouting-column-select" class="login-input" style="max-width:160px;">
+          <option value="all">All columns</option>
+          <option value="Event">Event</option>
+          <option value="Match number">Match</option>
+          <option value="Team number">Team</option>
+          <option value="Alliance">Alliance</option>
+          <option value="Scouter name">Scouter</option>
+          <option value="notes">Notes</option>
+          <option value="Rating">Rating</option>
+        </select>
         <input
           id="scouting-search"
           type="text"
           class="login-input"
           style="max-width:260px;"
-          placeholder="Search by team, match, event, or notes"
+          placeholder="Search…"
         />
       </div>
     </section>
@@ -162,36 +172,60 @@
 
     function setupSearch() {
       const input = document.getElementById('scouting-search');
-      input.addEventListener('input', () => {
+      const select = document.getElementById('scouting-column-select');
+
+      function applyFilter() {
         const term = input.value.trim().toLowerCase();
+        const column = select.value;
+
         if (!term) {
           renderScoutingTable(scoutingItems);
           return;
         }
 
         const filtered = scoutingItems.filter(item => {
-          const event = String(item['Event'] || '').toLowerCase();
-          const match = String(item['Match number'] || '').toLowerCase();
-          const team = String(item['Team number'] || '').toLowerCase();
-          const scouter = String(item['Scouter name'] || '').toLowerCase();
-          const notes = [
+          // Build notes summary like in renderScoutingTable
+          const notesParts = [
             item['Auto notes'] || '',
             item['Teleop notes'] || '',
             item['Overall notes'] || ''
-          ].join(' ').toLowerCase();
+          ].filter(Boolean);
+          const notesSummary = notesParts.join(' | ').toLowerCase();
 
+          // Get values for key columns
+          const event = String(item['Event'] || '').toLowerCase();
+          const match = String(item['Match number'] || '').toLowerCase();
+          const team = String(item['Team number'] || '').toLowerCase();
+          const alliance = String(item['Alliance'] || '').toLowerCase();
+          const scouter = String(item['Scouter name'] || '').toLowerCase();
+          const rating = String(item['Rating'] || '').toLowerCase();
+
+          if (column === 'Event') return event.includes(term);
+          if (column === 'Match number') return match.includes(term);
+          if (column === 'Team number') return team.includes(term);
+          if (column === 'Alliance') return alliance.includes(term);
+          if (column === 'Scouter name') return scouter.includes(term);
+          if (column === 'Rating') return rating.includes(term);
+          if (column === 'notes') return notesSummary.includes(term);
+
+          // 'all' – search across everything
           return (
             event.includes(term) ||
             match.includes(term) ||
             team.includes(term) ||
+            alliance.includes(term) ||
             scouter.includes(term) ||
-            notes.includes(term)
+            rating.includes(term) ||
+            notesSummary.includes(term)
           );
         });
 
-        renderScoutingTable(filtered);
-      });
-    }
+    renderScoutingTable(filtered);
+  }
+
+  input.addEventListener('input', applyFilter);
+  select.addEventListener('change', applyFilter);
+}
 
     document.addEventListener('DOMContentLoaded', () => {
       loadScoutingData();
