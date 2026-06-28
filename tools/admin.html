@@ -7,76 +7,79 @@
   <link rel="stylesheet" href="../assets/styles.css" />
 </head>
 <body>
-<header class="site-header">
-  <div class="brand">
-    <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
-    <div class="brand-text">
-      <span class="team-number">Team Tiger 9551</span>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+      </div>
+      <div class="brand-text">
+        <span class="team-number">Team Tiger 9551</span>
+      </div>
     </div>
-  </div>
-  <nav class="main-nav">
-    <a href="../../index.html">Home</a>
-    <a href="../../team/about.html">Team</a>
-    <a href="../../team/robots.html">Robots</a>
-    <a href="../../team/sponsors.html">Sponsors</a>
-    <a href="../../team/media.html">Media</a>
-    <a href="../../team/contact.html">Contact</a>
-    <a href="../index.html">Tools</a>
-  </nav>
-</header>
+    <nav class="main-nav">
+      <a href="../index.html">Home</a>
+      <a href="../team/about.html">Team</a>
+      <a href="../team/robots.html">Robots</a>
+      <a href="../team/sponsors.html">Sponsors</a>
+      <a href="../team/media.html">Media</a>
+      <a href="../team/contact.html">Contact</a>
+      <a href="index.html">Tools</a>
+    </nav>
+  </header>
+
   <main class="login-page">
-  <section class="login-card" id="admin-locked">
-    <h1>Admin access</h1>
-    <p>Restricted configuration for Team Tiger 9551 scouting and inventory tools.</p>
+    <section class="login-card">
+      <h1>Admin settings</h1>
+      <p>Configure event settings used by the scouting tools.</p>
 
-    <div class="login-form-group">
-      <label for="admin-password">Admin password</label>
-      <input
-        type="password"
-        id="admin-password"
-        class="login-input"
-        placeholder="Enter admin password"
-      />
-    </div>
+      <div class="login-form-group">
+        <label for="event-name-admin">Current event name</label>
+        <input
+          id="event-name-admin"
+          type="text"
+          class="login-input"
+          placeholder="e.g., 2026 XYZ Regional"
+        />
+      </div>
 
-    <div class="login-actions">
-      <button class="btn small" onclick="adminLogin()">Unlock admin panel</button>
-      <span class="login-meta">For mentors and selected student leaders.</span>
-    </div>
+      <div class="login-actions">
+        <button class="btn small" onclick="saveCurrentEvent()">Save event</button>
+        <span class="login-meta">This event name will appear on the scouting form.</span>
+      </div>
 
-    <p id="admin-error" class="muted" style="margin-top:8px;"></p>
-  </section>
-
-  <section class="login-card" id="admin-panel" style="display:none; max-width:520px;">
-    <h1>Admin settings</h1>
-    <p>Adjust Team Tiger 9551 tool configuration here.</p>
-    <div class="login-form-group">
-      <label for="event-key">Default event key (The Blue Alliance)</label>
-      <input id="event-key" type="text" class="login-input" placeholder="e.g., 2026xxxx" />
-    </div>
-    <div class="login-actions">
-      <button class="btn small">Save settings</button>
-      <span class="login-meta">Wire this later to your backend or Apps Script.</span>
-    </div>
-  </section>
+      <p id="event-save-status" class="muted" style="margin-top:8px;"></p>
+    </section>
   </main>
-  <footer class="site-footer">
-    <p>© 2024 Team Tiger 9551</p>
-  </footer>
-  <script>
-    const ADMIN_PASSWORD = "StemHarvest";
 
-    function adminLogin() {
-      const input = document.getElementById('admin-password').value;
-      const error = document.getElementById('admin-error');
-      if (input === ADMIN_PASSWORD) {
-        document.getElementById('admin-locked').style.display = 'none';
-        document.getElementById('admin-panel').style.display = 'block';
-        error.textContent = "";
-      } else {
-        error.textContent = "Incorrect password.";
-      }
+  <footer class="site-footer">
+    <p>© 20XX Team Tiger 9551</p>
+  </footer>
+
+  <script>
+    if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
+      window.location.href = 'login.html';
     }
+
+    function saveCurrentEvent() {
+      const input = document.getElementById('event-name-admin');
+      const status = document.getElementById('event-save-status');
+      const value = input.value.trim();
+
+      if (!value) {
+        status.textContent = 'Please enter an event name.';
+        return;
+      }
+
+      localStorage.setItem('teamTigerCurrentEvent', value);
+      status.textContent = 'Event name saved: ' + value;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const existing = localStorage.getItem('teamTigerCurrentEvent');
+      if (existing) {
+        document.getElementById('event-name-admin').value = existing;
+      }
+    });
   </script>
 </body>
 </html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>View scouting data – Team Tiger 9551</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+      </div>
+      <div class="brand-text">
+        <span class="team-number">Team Tiger 9551</span>
+        <span class="team-name">Team Tiger</span>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../team/about.html">Team</a>
+      <a href="../../team/robots.html">Robots</a>
+      <a href="../../team/sponsors.html">Sponsors</a>
+      <a href="../../team/media.html">Media</a>
+      <a href="../../team/contact.html">Contact</a>
+      <a href="../index.html">Tools</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="page-header">
+      <h1>Scouting data</h1>
+      <p>Browse match scouting entries collected for Team Tiger 9551.</p>
+    </section>
+
+    <section style="margin-bottom: 12px; display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center;">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="btn small secondary" onclick="logoutTools()">Log out</button>
+        <a class="btn small" href="index.html">New scouting entry</a>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <label for="scouting-search" class="login-meta" style="margin:0;">Search</label>
+        <input
+          id="scouting-search"
+          type="text"
+          class="login-input"
+          style="max-width:260px;"
+          placeholder="Search by team, match, event, or notes"
+        />
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="table-wrapper">
+        <table id="scouting-table">
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Match</th>
+              <th>Team</th>
+              <th>Alliance</th>
+              <th>Auto pieces</th>
+              <th>Teleop pieces</th>
+              <th>Endgame</th>
+              <th>Rating</th>
+              <th>Scouter</th>
+              <th>Notes (summary)</th>
+            </tr>
+          </thead>
+          <tbody id="scouting-body">
+          </tbody>
+        </table>
+      </div>
+      <p id="scouting-status" class="muted" style="margin-top:8px;"></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 20XX Team Tiger 9551</p>
+  </footer>
+
+  <script>
+    // Require tools login
+    if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
+      window.location.href = '../login.html';
+    }
+
+    function logoutTools() {
+      localStorage.removeItem('teamTigerToolsAccess');
+      window.location.href = '../../index.html';
+    }
+
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwc6K94yyOorZP40hnItrUmncjofEWeNrEj0iESQizecihNZSvzHMH3VKYWIVOpb1yZrQ/exec';
+
+    let scoutingItems = [];
+
+    async function loadScoutingData() {
+      const statusEl = document.getElementById('scouting-status');
+      const bodyEl = document.getElementById('scouting-body');
+      statusEl.textContent = 'Loading scouting data...';
+
+      try {
+        const res = await fetch(BACKEND_URL + '?mode=list');
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+        const data = await res.json();
+        scoutingItems = data.items || [];
+
+        if (!scoutingItems.length) {
+          statusEl.textContent = 'No scouting entries found yet.';
+          bodyEl.innerHTML = '';
+          return;
+        }
+
+        renderScoutingTable(scoutingItems);
+        statusEl.textContent = `Loaded ${scoutingItems.length} entries.`;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Error loading scouting data: ' + err.message;
+      }
+    }
+
+    function renderScoutingTable(items) {
+      const bodyEl = document.getElementById('scouting-body');
+      const rows = items.map(item => {
+        const event = item['Event'] || '';
+        const match = item['Match number'] || '';
+        const team = item['Team number'] || '';
+        const alliance = item['Alliance'] || '';
+        const autoPieces = item['Auto pieces scored'] || '';
+        const teleopPieces = item['Teleop pieces scored'] || '';
+        const endgame = item['Endgame result'] || '';
+        const rating = item['Rating'] || '';
+        const scouter = item['Scouter name'] || '';
+
+        const notesParts = [
+          item['Auto notes'] || '',
+          item['Teleop notes'] || '',
+          item['Overall notes'] || ''
+        ].filter(Boolean);
+        const notesSummary = notesParts.join(' | ');
+
+        return `
+          <tr>
+            <td>${event}</td>
+            <td>${match}</td>
+            <td>${team}</td>
+            <td>${alliance}</td>
+            <td>${autoPieces}</td>
+            <td>${teleopPieces}</td>
+            <td>${endgame}</td>
+            <td>${rating}</td>
+            <td>${scouter}</td>
+            <td>${notesSummary}</td>
+          </tr>
+        `;
+      }).join('');
+
+      bodyEl.innerHTML = rows;
+    }
+
+    function setupSearch() {
+      const input = document.getElementById('scouting-search');
+      input.addEventListener('input', () => {
+        const term = input.value.trim().toLowerCase();
+        if (!term) {
+          renderScoutingTable(scoutingItems);
+          return;
+        }
+
+        const filtered = scoutingItems.filter(item => {
+          const event = String(item['Event'] || '').toLowerCase();
+          const match = String(item['Match number'] || '').toLowerCase();
+          const team = String(item['Team number'] || '').toLowerCase();
+          const scouter = String(item['Scouter name'] || '').toLowerCase();
+          const notes = [
+            item['Auto notes'] || '',
+            item['Teleop notes'] || '',
+            item['Overall notes'] || ''
+          ].join(' ').toLowerCase();
+
+          return (
+            event.includes(term) ||
+            match.includes(term) ||
+            team.includes(term) ||
+            scouter.includes(term) ||
+            notes.includes(term)
+          );
+        });
+
+        renderScoutingTable(filtered);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadScoutingData();
+      setupSearch();
+    });
+  </script>
+</body>
+</html>

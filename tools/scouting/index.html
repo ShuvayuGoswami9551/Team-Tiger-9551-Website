@@ -7,43 +7,255 @@
   <link rel="stylesheet" href="../../assets/styles.css" />
 </head>
 <body>
-<header class="site-header">
-  <div class="brand">
-    <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
-    <div class="brand-text">
-      <span class="team-number">Team Tiger 9551</span>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+      </div>
+      <div class="brand-text">
+        <span class="team-number">Team Tiger 9551</span>
+        <span class="team-name">Team Tiger</span>
+      </div>
     </div>
-  </div>
-  <nav class="main-nav">
-    <a href="../../index.html">Home</a>
-    <a href="../../team/about.html">Team</a>
-    <a href="../../team/robots.html">Robots</a>
-    <a href="../../team/sponsors.html">Sponsors</a>
-    <a href="../../team/media.html">Media</a>
-    <a href="../../team/contact.html">Contact</a>
-    <a href="../index.html">Tools</a>
-  </nav>
-</header>
+    <nav class="main-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../team/about.html">Team</a>
+      <a href="../../team/robots.html">Robots</a>
+      <a href="../../team/sponsors.html">Sponsors</a>
+      <a href="../../team/media.html">Media</a>
+      <a href="../../team/contact.html">Contact</a>
+      <a href="../index.html">Tools</a>
+    </nav>
+  </header>
 
   <main>
     <section class="page-header">
-      <h1>Team Tiger scouting app</h1>
-      <p>This page hosts our offline‑first scouting web app used during competitions.</p>
+      <h1>Match scouting</h1>
+      <p>Record robot performance during FRC matches for Team Tiger 9551.</p>
     </section>
 
-    <section class="card">
-      <p>placeholder for scouting</p>
+    <section style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+      <div class="login-meta">
+        Current event: <span id="event-name-display">(no event set)</span>
+      </div>
+      <button class="btn small secondary" onclick="logoutTools()">Log out</button>
+    </section>
+
+    <section class="page-grid">
+      <!-- Match info -->
+      <article class="card">
+        <h2>Match & robot info</h2>
+        <div class="login-form-group">
+          <label for="scouter-name">Scouter name</label>
+          <input id="scouter-name" type="text" class="login-input" placeholder="Your name" required />
+        </div>
+
+        <div class="login-form-group">
+          <label for="match-number">Match number</label>
+          <input id="match-number" type="number" class="login-input" min="1" placeholder="e.g., 12" required />
+        </div>
+
+        <div class="login-form-group">
+          <label for="team-number">Team number</label>
+          <input id="team-number" type="number" class="login-input" min="1" placeholder="e.g., 9551" required />
+        </div>
+
+        <div class="login-form-group">
+          <label for="alliance">Alliance</label>
+          <select id="alliance" class="login-input">
+            <option value="red">Red</option>
+            <option value="blue">Blue</option>
+          </select>
+        </div>
+      </article>
+
+      <!-- Auto -->
+      <article class="card">
+        <h2>Autonomous</h2>
+        <div class="login-form-group">
+          <label for="auto-start-pos">Start position</label>
+          <input id="auto-start-pos" type="text" class="login-input" placeholder="Describe start position" />
+        </div>
+
+        <div class="login-form-group">
+          <label for="auto-pieces-scored">Pieces scored in auto</label>
+          <input id="auto-pieces-scored" type="number" class="login-input" min="0" value="0" />
+        </div>
+
+        <div class="login-form-group">
+          <label for="auto-mobility">Mobility</label>
+          <select id="auto-mobility" class="login-input">
+            <option value="none">None</option>
+            <option value="partial">Partial</option>
+            <option value="full">Full</option>
+          </select>
+        </div>
+
+        <div class="login-form-group">
+          <label for="auto-notes">Auto notes</label>
+          <textarea id="auto-notes" class="login-input" placeholder="Important auto behavior to note"></textarea>
+        </div>
+      </article>
+
+      <!-- Teleop & endgame -->
+      <article class="card">
+        <h2>Teleop & endgame</h2>
+        <div class="login-form-group">
+          <label for="teleop-pieces-scored">Pieces scored in teleop</label>
+          <input id="teleop-pieces-scored" type="number" class="login-input" min="0" value="0" />
+        </div>
+
+        <div class="login-form-group">
+          <label for="defense-level">Defense level</label>
+          <select id="defense-level" class="login-input">
+            <option value="none">None</option>
+            <option value="light">Light</option>
+            <option value="moderate">Moderate</option>
+            <option value="heavy">Heavy</option>
+          </select>
+        </div>
+
+        <div class="login-form-group">
+          <label for="endgame-result">Endgame result</label>
+          <select id="endgame-result" class="login-input">
+            <option value="none">None</option>
+            <option value="partial-climb">Partial climb</option>
+            <option value="full-climb">Full climb</option>
+            <option value="failed-climb">Failed climb</option>
+          </select>
+        </div>
+
+        <div class="login-form-group">
+          <label for="teleop-notes">Teleop & endgame notes</label>
+          <textarea id="teleop-notes" class="login-input" placeholder="Reliability, driver skill, issues, etc."></textarea>
+        </div>
+      </article>
+
+      <!-- Overall impression -->
+      <article class="card">
+        <h2>Overall impression</h2>
+        <div class="login-form-group">
+          <label for="rating">Overall rating</label>
+          <select id="rating" class="login-input">
+            <option value="1">1 – Very weak</option>
+            <option value="2">2 – Below average</option>
+            <option value="3" selected>3 – Average</option>
+            <option value="4">4 – Strong</option>
+            <option value="5">5 – Excellent</option>
+          </select>
+        </div>
+
+        <div class="login-form-group">
+          <label for="overall-notes">Notes</label>
+          <textarea id="overall-notes" class="login-input" placeholder="Overall thoughts about this robot in this match."></textarea>
+        </div>
+
+        <div class="login-actions">
+          <button id="scouting-submit-btn" class="btn small" onclick="submitScoutingEntry()">Save entry</button>
+          <span class="login-meta">Entries are sent directly to Google Sheets.</span>
+        </div>
+
+        <p id="save-status" class="muted" style="margin-top:8px;"></p>
+      </article>
     </section>
   </main>
 
   <footer class="site-footer">
     <p>© 20XX Team Tiger 9551</p>
   </footer>
+
   <script>
-  // Simple gate: require teamTigerToolsAccess flag
-  if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
-    window.location.href = '../login.html';
-  }
+    if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
+      window.location.href = '../login.html';
+    }
+
+    function logoutTools() {
+      localStorage.removeItem('teamTigerToolsAccess');
+      window.location.href = '../../index.html';
+    }
+
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwc6K94yyOorZP40hnItrUmncjofEWeNrEj0iESQizecihNZSvzHMH3VKYWIVOpb1yZrQ/exec';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const eventValue = localStorage.getItem('teamTigerCurrentEvent');
+      const display = document.getElementById('event-name-display');
+      display.textContent = eventValue || '(no event set)';
+    });
+
+    async function submitScoutingEntry() {
+      const status = document.getElementById('save-status');
+      const btn = document.getElementById('scouting-submit-btn');
+
+      const eventValue = localStorage.getItem('teamTigerCurrentEvent') || '';
+
+      const data = {
+        scouterName: document.getElementById('scouter-name').value,
+        eventName: eventValue,
+        matchNumber: document.getElementById('match-number').value,
+        teamNumber: document.getElementById('team-number').value,
+        alliance: document.getElementById('alliance').value,
+        autoStartPos: document.getElementById('auto-start-pos').value,
+        autoPiecesScored: document.getElementById('auto-pieces-scored').value,
+        autoMobility: document.getElementById('auto-mobility').value,
+        autoNotes: document.getElementById('auto-notes').value,
+        teleopPiecesScored: document.getElementById('teleop-pieces-scored').value,
+        defenseLevel: document.getElementById('defense-level').value,
+        endgameResult: document.getElementById('endgame-result').value,
+        teleopNotes: document.getElementById('teleop-notes').value,
+        rating: document.getElementById('rating').value,
+        overallNotes: document.getElementById('overall-notes').value
+      };
+
+      if (!data.scouterName || !data.matchNumber || !data.teamNumber) {
+        status.textContent = 'Please fill in scouter, match, and team number.';
+        return;
+      }
+
+      status.textContent = 'Submitting entry...';
+      btn.disabled = true;
+
+      try {
+        const params = new URLSearchParams({
+          mode: 'add',
+          scouterName: data.scouterName,
+          eventName: data.eventName,
+          matchNumber: data.matchNumber,
+          teamNumber: data.teamNumber,
+          alliance: data.alliance,
+          autoStartPos: data.autoStartPos,
+          autoPiecesScored: data.autoPiecesScored,
+          autoMobility: data.autoMobility,
+          autoNotes: data.autoNotes,
+          teleopPiecesScored: data.teleopPiecesScored,
+          defenseLevel: data.defenseLevel,
+          endgameResult: data.endgameResult,
+          teleopNotes: data.teleopNotes,
+          rating: data.rating,
+          overallNotes: data.overallNotes
+        });
+
+        const res = await fetch(BACKEND_URL + '?' + params.toString());
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+
+        const json = await res.json();
+
+        if (json.success) {
+          status.textContent = 'Entry submitted to Google Sheets.';
+          document.getElementById('auto-notes').value = '';
+          document.getElementById('teleop-notes').value = '';
+          document.getElementById('overall-notes').value = '';
+        } else {
+          status.textContent = 'Error: ' + (json.error || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('Scouting submit error:', err);
+        status.textContent = 'Error submitting entry: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
   </script>
 </body>
 </html>
