@@ -40,7 +40,15 @@
 
       <div class="login-form-group">
         <label for="category">Category</label>
-        <input id="category" type="text" class="login-input" placeholder="Mechanical, Electrical, Hardware, etc." />
+          <select id="category" class="login-input">
+            <option value="">Select a category</option>
+            <option value="Mechanical">Mechanical</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Pneumatic">Pneumatic</option>
+            <option value="Hardware">Hardware</option>
+            <option value="Tools">Tools</option>
+            <option value="Misc">Misc</option>
+           </select>
       </div>
 
       <div class="login-form-group">
@@ -105,6 +113,11 @@
 
       if (!data.itemName) {
         statusEl.textContent = 'Item name is required.';
+        return;
+      }
+
+      if (!data.category) {
+        statusEl.textContent = 'Please choose a category.';
         return;
       }
 
