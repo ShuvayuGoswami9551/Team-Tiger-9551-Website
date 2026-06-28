@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Submit Inventory Item – Team Tiger 9551</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../../assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+      </div>
+      <div class="brand-text">
+        <span class="team-number">Team Tiger 9551</span>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../team/about.html">Team</a>
+      <a href="../../team/robots.html">Robots</a>
+      <a href="../../team/sponsors.html">Sponsors</a>
+      <a href="../../team/media.html">Media</a>
+      <a href="../../team/contact.html">Contact</a>
+      <a href="../index.html">Tools</a>
+    </nav>
+  </header>
+
+  <main class="login-page">
+    <section class="login-card">
+      <h1>Submit new inventory item</h1>
+      <p>Add a part or material to Team Tiger’s inventory. Admins can later update cost and minimum stock.</p>
+
+      <div class="login-form-group">
+        <label for="item-name">Item name</label>
+        <input id="item-name" type="text" class="login-input" placeholder="e.g., 10-32 x 1.5&quot; bolt" required />
+      </div>
+
+      <div class="login-form-group">
+        <label for="category">Category</label>
+        <input id="category" type="text" class="login-input" placeholder="Mechanical, Electrical, Hardware, etc." />
+      </div>
+
+      <div class="login-form-group">
+        <label for="part-number">Part number / SKU</label>
+        <input id="part-number" type="text" class="login-input" placeholder="e.g., BH-1032-15" />
+      </div>
+
+      <div class="login-form-group">
+        <label for="quantity">Quantity on hand</label>
+        <input id="quantity" type="number" class="login-input" min="0" value="0" />
+      </div>
+
+      <div class="login-form-group">
+        <label for="location">Location</label>
+        <input id="location" type="text" class="login-input" placeholder="e.g., Hardware wall, Bin A-3" />
+      </div>
+
+      <div class="login-form-group">
+        <label for="image-url">Image URL (optional)</label>
+        <input id="image-url" type="url" class="login-input" placeholder="https://example.com/part-image.png" />
+      </div>
+
+      <div class="login-form-group">
+        <label for="notes">Notes</label>
+        <textarea id="notes" class="login-input" placeholder="Any extra details about this part."></textarea>
+      </div>
+
+      <div class="login-actions">
+        <button class="btn small" onclick="submitItem()">Submit item</button>
+        <span class="login-meta">Photos from phones can be uploaded and linked via URL.</span>
+      </div>
+
+      <p id="submit-status" class="muted" style="margin-top:8px;"></p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 20XX Team Tiger 9551</p>
+  </footer>
+
+  <script>
+    // Require tools login
+    if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
+      window.location.href = '../login.html';
+    }
+
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxfGXBot1C4Z1_TA8fFn3sdmRxelDHZeWEbmqtsGorq7NoPVUzJnQyamzFmZ8ZuBsEYWg/exec'; // same as index.html
+
+    async function submitItem() {
+      const statusEl = document.getElementById('submit-status');
+
+      const data = {
+        itemName: document.getElementById('item-name').value,
+        category: document.getElementById('category').value,
+        partNumber: document.getElementById('part-number').value,
+        quantityOnHand: Number(document.getElementById('quantity').value || 0),
+        location: document.getElementById('location').value,
+        imageUrl: document.getElementById('image-url').value,
+        notes: document.getElementById('notes').value
+      };
+
+      if (!data.itemName) {
+        statusEl.textContent = 'Item name is required.';
+        return;
+      }
+
+      statusEl.textContent = 'Submitting item...';
+
+      try {
+        const res = await fetch(BACKEND_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const json = await res.json();
+
+        if (json.success) {
+          statusEl.textContent = 'Item submitted successfully.';
+          // optional: clear form
+          document.getElementById('item-name').value = '';
+          document.getElementById('category').value = '';
+          document.getElementById('part-number').value = '';
+          document.getElementById('quantity').value = '0';
+          document.getElementById('location').value = '';
+          document.getElementById('image-url').value = '';
+          document.getElementById('notes').value = '';
+        } else {
+          statusEl.textContent = 'Error: ' + (json.error || 'Unknown error');
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Error submitting item.';
+      }
+    }
+  </script>
+</body>
+</html>

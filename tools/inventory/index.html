@@ -7,43 +7,123 @@
   <link rel="stylesheet" href="../../assets/styles.css" />
 </head>
 <body>
-<header class="site-header">
-  <div class="brand">
-    <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
-    <div class="brand-text">
-      <span class="team-number">Team Tiger 9551</span>
+  <header class="site-header">
+    <div class="brand">
+      <div class="logo-wrap">
+        <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+      </div>
+      <div class="brand-text">
+        <span class="team-number">Team Tiger 9551</span>
+      </div>
     </div>
-  </div>
-  <nav class="main-nav">
-    <a href="../../index.html">Home</a>
-    <a href="../../team/about.html">Team</a>
-    <a href="../../team/robots.html">Robots</a>
-    <a href="../../team/sponsors.html">Sponsors</a>
-    <a href="../../team/media.html">Media</a>
-    <a href="../../team/contact.html">Contact</a>
-    <a href="../index.html">Tools</a>
-  </nav>
-</header>
+    <nav class="main-nav">
+      <a href="../../index.html">Home</a>
+      <a href="../../team/about.html">Team</a>
+      <a href="../../team/robots.html">Robots</a>
+      <a href="../../team/sponsors.html">Sponsors</a>
+      <a href="../../team/media.html">Media</a>
+      <a href="../../team/contact.html">Contact</a>
+      <a href="../index.html">Tools</a>
+    </nav>
+  </header>
 
   <main>
     <section class="page-header">
-      <h1>Team Tiger inventory</h1>
-      <p>Use this page to track parts, quantities, and locations for Team Tiger’s build space.</p>
+      <h1>Inventory – Team Tiger 9551</h1>
+      <p>All parts and materials currently tracked in Team Tiger’s inventory.</p>
+    </section>
+
+    <section style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn small secondary" onclick="logoutTools()">Log out</button>
+      <a class="btn small" href="submit.html">Submit new item</a>
     </section>
 
     <section class="card">
-      <p>inventory sheet</p>
+      <div class="table-wrapper">
+        <table id="inventory-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Item name</th>
+              <th>Category</th>
+              <th>Part # / SKU</th>
+              <th>Quantity</th>
+              <th>Location</th>
+              <th>Minimum stock</th>
+              <th>Supplier</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-body">
+            <!-- filled by JS -->
+          </tbody>
+        </table>
+      </div>
+      <p id="inventory-status" class="muted" style="margin-top:8px;"></p>
     </section>
   </main>
 
   <footer class="site-footer">
     <p>© 20XX Team Tiger 9551</p>
   </footer>
+
   <script>
-  // Simple gate: require teamTigerToolsAccess flag
-  if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
-    window.location.href = '../login.html';
-  }
+    // Require tools login
+    if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
+      window.location.href = '../login.html';
+    }
+
+    function logoutTools() {
+      localStorage.removeItem('teamTigerToolsAccess');
+      window.location.href = '../../index.html';
+    }
+
+    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxfGXBot1C4Z1_TA8fFn3sdmRxelDHZeWEbmqtsGorq7NoPVUzJnQyamzFmZ8ZuBsEYWg/exec'; // replace with Apps Script URL
+
+    async function loadInventory() {
+      const statusEl = document.getElementById('inventory-status');
+      const bodyEl = document.getElementById('inventory-body');
+      statusEl.textContent = 'Loading inventory...';
+
+      try {
+        const res = await fetch(BACKEND_URL + '?mode=list');
+        const data = await res.json();
+        const items = data.items || [];
+
+        if (!items.length) {
+          statusEl.textContent = 'No inventory items found yet.';
+          bodyEl.innerHTML = '';
+          return;
+        }
+
+        const rows = items.map(item => {
+          const imgUrl = item['Image URL'] || '';
+          const imgHtml = imgUrl
+            ? `<img src="${imgUrl}" alt="${item['Item name'] || 'Part image'}" class="inventory-image" />`
+            : '';
+
+          return `
+            <tr>
+              <td>${imgHtml}</td>
+              <td>${item['Item name'] || ''}</td>
+              <td>${item['Category'] || ''}</td>
+              <td>${item['Part number / SKU'] || ''}</td>
+              <td>${item['Quantity on hand'] || ''}</td>
+              <td>${item['Location'] || ''}</td>
+              <td>${item['Minimum stock'] || ''}</td>
+              <td>${item['Supplier'] || ''}</td>
+            </tr>
+          `;
+        }).join('');
+
+        bodyEl.innerHTML = rows;
+        statusEl.textContent = `Loaded ${items.length} items.`;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = 'Error loading inventory.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadInventory);
   </script>
 </body>
 </html>
