@@ -1,65 +1,140 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Contact – Team Tiger 9551</title>
+  <meta charset="UTF-8" />
+  <title>Team Tiger – Contact form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="../assets/styles.css" />
+
+  <!-- Shared styles for the whole site -->
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header class="site-header">
-  <div class="brand">
-    <img src="../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
-    <div class="brand-text">
-      <span class="team-number">Team Tiger 9551</span>
+  <!-- Global tools navigation (adjust hrefs to match your structure) -->
+  <nav class="tools-nav">
+    <div class="tools-nav-left">
+      <span class="tools-nav-title">Team Tiger Tools</span>
     </div>
-  </div>
-  <nav class="main-nav">
-    <a href="../index.html">Home</a>
-    <a href="about.html">Team</a>
-    <a href="robots.html">Robots</a>
-    <a href="sponsors.html">Sponsors</a>
-    <a href="media.html">Media</a>
-    <a href="contact.html" class="active">Contact</a>
-    <a href="../tools/index.html">Tools</a>
+    <div class="tools-nav-links">
+      <a href="index.html" class="tools-nav-link">Tools home</a>
+      <a href="scouting/index.html" class="tools-nav-link">Scouting</a>
+      <a href="scouting/view.html" class="tools-nav-link">View scouting</a>
+      <a href="inventory/index.html" class="tools-nav-link">Inventory</a>
+      <a href="admin.html" class="tools-nav-link">Admin</a>
+      <a href="contact.html" class="tools-nav-link">Contact</a>
+    </div>
   </nav>
-</header>
 
-  <main>
-    <section class="page-header">
-      <h1>Contact Team Tiger 9551</h1>
-      <p>Reach out about sponsorships, outreach requests, or joining Team Tiger.</p>
-    </section>
+  <main class="page">
+    <header class="section-header-block">
+      <h1 class="section-header">Contact Team Tiger</h1>
+      <p class="section-subtitle">
+        Send a message to the team. It will be saved in our tools spreadsheet like our scouting and inventory entries.
+      </p>
+    </header>
 
-    <section class="page-grid">
-      <article class="card">
-        <h2>Contact form</h2>
-        <form>
-          <div>
-            <label for="name">Name</label><br />
-            <input id="name" type="text" placeholder="Your name" />
-          </div>
-          <div>
-            <label for="email">Email</label><br />
-            <input id="email" type="email" placeholder="you@example.com" />
-          </div>
-          <div>
-            <label for="message">Message</label><br />
-            <textarea id="message" placeholder="How can Team Tiger help?"></textarea>
-          </div>
-          <button type="submit" class="btn small">Send</button>
-        </form>
-        <p class="muted">need to connect this with a actual sheet</p>
-      </article>
-      <article class="card">
-        <h2>Other ways to reach us</h2>
-        <p>List your team email, school, or social media accounts.</p>
-      </article>
+    <section class="section">
+      <form id="contact-form">
+        <div class="form-row">
+          <label class="login-meta" for="contact-name">Your name</label>
+          <input
+            id="contact-name"
+            type="text"
+            name="name"
+            class="login-input"
+            required
+            placeholder="Your name"
+          />
+        </div>
+
+        <div class="form-row">
+          <label class="login-meta" for="contact-email">Your email</label>
+          <input
+            id="contact-email"
+            type="email"
+            name="email"
+            class="login-input"
+            required
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div class="form-row">
+          <label class="login-meta" for="contact-subject">Subject</label>
+          <input
+            id="contact-subject"
+            type="text"
+            name="subject"
+            class="login-input"
+            required
+            placeholder="What is this about?"
+          />
+        </div>
+
+        <div class="form-row">
+          <label class="login-meta" for="contact-message">Message</label>
+          <textarea
+            id="contact-message"
+            name="message"
+            class="login-input"
+            rows="5"
+            required
+            placeholder="Your message for the team"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn small">Send message</button>
+          <span id="contact-status" class="login-meta"></span>
+        </div>
+      </form>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <p>© 2024 Team Tiger 9551</p>
-  </footer>
+  <script>
+    // Replace this with your deployed Apps Script web app URL
+    const CONTACT_FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwJUYR830Ow4_zu3Fo6v18L8PSFKxNREwipf-vOpdlcdAhl35Yl3qXdi-8ca6h-JIeEdg/exec';
+
+    function setupContactForm() {
+      const form = document.getElementById('contact-form');
+      const statusEl = document.getElementById('contact-status');
+      if (!form) return;
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        statusEl.textContent = 'Sending…';
+
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+
+        try {
+          const res = await fetch(CONTACT_FORM_ENDPOINT, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+
+          if (!res.ok) {
+            throw new Error('Network error');
+          }
+
+          const json = await res.json();
+          statusEl.textContent = json.message || 'Message sent!';
+          form.reset();
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = 'There was an error sending your message.';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setupContactForm();
+    });
+  </script>
 </body>
 </html>
