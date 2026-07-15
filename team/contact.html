@@ -10,32 +10,20 @@
   <header class="site-header">
     <div class="brand">
       <div class="logo-wrap">
-        <img src="../../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
+        <img src="../assets/logo-team-tiger.png" alt="Team Tiger 9551 logo" class="team-logo" />
       </div>
       <div class="brand-text">
         <span class="team-number">Team Tiger 9551</span>
       </div>
     </div>
     <nav class="main-nav">
-      <a href="../../index.html">Home</a>
-      <a href="../../team/about.html">Team</a>
-      <a href="../../team/robots.html">Robots</a>
-      <a href="../../team/sponsors.html">Sponsors</a>
-      <a href="../../team/media.html">Media</a>
-      <a href="../../team/contact.html" class="active">Contact</a>
-      <a href="../index.html">Tools</a>
-    </nav>
-    <nav class="tools-nav">
-      <div class="tools-nav-left">
-        <span class="tools-nav-title">Team Tiger Tools</span>
-      </div>
-      <div class="tools-nav-links">
-        <a href="../index.html" class="tools-nav-link">Tools home</a>
-        <a href="../scouting/index.html" class="tools-nav-link">Scouting</a>
-        <a href="../scouting/view.html" class="tools-nav-link">View scouting</a>
-        <a href="../inventory/index.html" class="tools-nav-link">Inventory</a>
-        <a href="../admin.html" class="tools-nav-link">Admin</a>
-      </div>
+      <a href="../index.html">Home</a>
+      <a href="../team/about.html">Team</a>
+      <a href="../team/robots.html">Robots</a>
+      <a href="../team/sponsors.html">Sponsors</a>
+      <a href="../team/media.html">Media</a>
+      <a href="../team/contact.html" class="active">Contact</a>
+      <a href="../tools/index.html">Tools</a>
     </nav>
   </header>
 
@@ -45,12 +33,10 @@
       <p>Send a message to the team. It will be saved in our tools spreadsheet like scouting and inventory entries.</p>
     </section>
 
-    <!-- If you want tools login required for contact too -->
     <section style="margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center;">
-      <div class="login-meta">
+    <div class="login-meta">
         Messages go to the mentors and leadership via Google Sheets.
-      </div>
-      <button class="btn small secondary" onclick="logoutTools()">Log out</button>
+    </div>
     </section>
 
     <section class="page-grid">
@@ -118,17 +104,6 @@
   </footer>
 
   <script>
-    // Require tools login if you want this form inside tools access
-    if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
-      window.location.href = '../login.html';
-    }
-
-    function logoutTools() {
-      localStorage.removeItem('teamTigerToolsAccess');
-      window.location.href = '../../index.html';
-    }
-
-    // Use your own Apps Script URL, similar to SCOUTING_BACKEND_URL
     const CONTACT_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbzCYve6IQVn2IE9yN0zX5iju1FDXawQ92QAGWs0zELf4tTxWyeDb2AxnNQfVeLDSEkgXw/exec';
 
     async function submitContactMessage() {
@@ -169,10 +144,9 @@
         if (json.success) {
           statusEl.textContent = 'Message submitted to Google Sheets.';
           document.getElementById('contact-message').value = '';
-          // If you want, also clear subject/email/name:
-          // document.getElementById('contact-name').value = '';
-          // document.getElementById('contact-email').value = '';
-          // document.getElementById('contact-subject').value = '';
+          document.getElementById('contact-name').value = '';
+          document.getElementById('contact-email').value = '';
+          document.getElementById('contact-subject').value = '';
         } else {
           statusEl.textContent = 'Error: ' + (json.error || 'Unknown error');
         }
