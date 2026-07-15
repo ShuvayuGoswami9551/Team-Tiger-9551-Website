@@ -586,22 +586,55 @@ textarea {
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
+    padding: 8px 12px; /* less padding */
   }
 
-  main {
-    padding: 18px 12px 28px;
+  .brand {
+    gap: 6px;
   }
 
-  .hero {
-    padding: 20px 16px;
+  .team-logo {
+    height: 28px; /* smaller logo */
+  }
+
+  .team-number {
+    font-size: 0.7rem;
   }
 
   .main-nav {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+    font-size: 0.8rem;
   }
-  
-  .team-logo {
-    height: 32px;  /* smaller logo on mobile */
+
+  .main-nav a {
+    padding: 4px 8px;
+  }
+
+  .tools-nav {
+    padding: 6px 12px;
+  }
+
+  .tools-nav-title {
+    font-size: 13px;
+  }
+
+  .tools-nav-links {
+    display: none;
+  }
+
+  .tools-nav-link {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .tools-nav::after {
+    content: "Tools Menu";
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  main {
+    padding: 16px 12px 24px;
   }
 }
