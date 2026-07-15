@@ -541,6 +541,38 @@ textarea {
   color: var(--text);
 }
 
+/* Scouting Page */
+
+.counter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.counter-btn {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(218,171,45,0.6);
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-width: 40px;
+  text-align: center;
+}
+
+.counter-btn:hover {
+  background: rgba(218,171,45,0.16);
+  color: var(--text);
+}
+
+.counter-input {
+  width: 48px;
+  text-align: center;
+  padding: 4px 6px;
+}
+
 /* Responsive tweaks */
 
 @media (max-width: 640px) {

@@ -114,8 +114,10 @@
         <div class="login-form-group">
           <label for="auto-pieces-scored">Pieces scored in auto</label>
           <div class="counter-row">
-            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', -1)">–1</button>
-            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', -5)">–5</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('auto-pieces-scored', -1)">–1</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('auto-pieces-scored', -5)">–5</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('auto-pieces-scored', -10)">–10</button>
+
             <input
               id="auto-pieces-scored"
               type="number"
@@ -124,8 +126,10 @@
               value="0"
               readonly
             />
-            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', 1)">+1</button>
-            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', 5)">+5</button>
+
+            <button type="button" class="counter-btn" onclick="adjustCounter('auto-pieces-scored', 1)">+1</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('auto-pieces-scored', 5)">+5</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('auto-pieces-scored', 10)">+10</button>
           </div>
         </div>
 
@@ -151,8 +155,10 @@
         <div class="login-form-group">
           <label for="teleop-pieces-scored">Pieces scored in teleop</label>
           <div class="counter-row">
-            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', -1)">–1</button>
-            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', -5)">–5</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('teleop-pieces-scored', -1)">–1</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('teleop-pieces-scored', -5)">–5</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('teleop-pieces-scored', -10)">–10</button>
+
             <input
               id="teleop-pieces-scored"
               type="number"
@@ -161,8 +167,10 @@
               value="0"
               readonly
             />
-            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', 1)">+1</button>
-            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', 5)">+5</button>
+
+            <button type="button" class="counter-btn" onclick="adjustCounter('teleop-pieces-scored', 1)">+1</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('teleop-pieces-scored', 5)">+5</button>
+            <button type="button" class="counter-btn" onclick="adjustCounter('teleop-pieces-scored', 10)">+10</button>
           </div>
         </div>
 
