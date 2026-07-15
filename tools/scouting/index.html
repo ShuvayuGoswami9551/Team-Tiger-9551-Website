@@ -53,7 +53,7 @@
     </section>
 
     <section class="page-grid">
-      <!-- Match info -->
+      <!-- Prematch -->
       <article class="card">
         <h2>Match & robot info</h2>
 
@@ -92,11 +92,20 @@
             <option value="blue">Blue</option>
           </select>
         </div>
+
+        <div class="login-form-group">
+          <label for="no-show">No show</label>
+          <label class="toggle">
+            <input id="no-show" type="checkbox" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
       </article>
 
-      <!-- Auto -->
+      <!-- Autonomous -->
       <article class="card">
         <h2>Autonomous</h2>
+
         <div class="login-form-group">
           <label for="auto-start-pos">Start position</label>
           <input id="auto-start-pos" type="text" class="login-input" placeholder="Describe start position" />
@@ -104,7 +113,20 @@
 
         <div class="login-form-group">
           <label for="auto-pieces-scored">Pieces scored in auto</label>
-          <input id="auto-pieces-scored" type="number" class="login-input" min="0" value="0" />
+          <div class="counter-row">
+            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', -1)">–1</button>
+            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', -5)">–5</button>
+            <input
+              id="auto-pieces-scored"
+              type="number"
+              class="login-input counter-input"
+              min="0"
+              value="0"
+              readonly
+            />
+            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', 1)">+1</button>
+            <button type="button" class="btn small secondary" onclick="adjustCounter('auto-pieces-scored', 5)">+5</button>
+          </div>
         </div>
 
         <div class="login-form-group">
@@ -122,12 +144,26 @@
         </div>
       </article>
 
-      <!-- Teleop & endgame -->
+      <!-- Teleop -->
       <article class="card">
-        <h2>Teleop & endgame</h2>
+        <h2>Teleop</h2>
+
         <div class="login-form-group">
           <label for="teleop-pieces-scored">Pieces scored in teleop</label>
-          <input id="teleop-pieces-scored" type="number" class="login-input" min="0" value="0" />
+          <div class="counter-row">
+            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', -1)">–1</button>
+            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', -5)">–5</button>
+            <input
+              id="teleop-pieces-scored"
+              type="number"
+              class="login-input counter-input"
+              min="0"
+              value="0"
+              readonly
+            />
+            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', 1)">+1</button>
+            <button type="button" class="btn small secondary" onclick="adjustCounter('teleop-pieces-scored', 5)">+5</button>
+          </div>
         </div>
 
         <div class="login-form-group">
@@ -159,6 +195,11 @@
             <option value="balanced">Balanced</option>
           </select>
         </div>
+      </article>
+
+      <!-- Endgame -->
+      <article class="card">
+        <h2>Endgame</h2>
 
         <div class="login-form-group">
           <label for="endgame-result">Endgame result</label>
@@ -172,9 +213,56 @@
         </div>
 
         <div class="login-form-group">
+          <label for="mechanical-issue">Mechanical issue</label>
+          <label class="toggle">
+            <input id="mechanical-issue" type="checkbox" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="login-form-group">
+          <label for="tipped-over">Tipped/fell over</label>
+          <label class="toggle">
+            <input id="tipped-over" type="checkbox" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="login-form-group">
           <label for="teleop-notes">Teleop & endgame notes</label>
           <textarea id="teleop-notes" class="login-input" placeholder="Reliability, driver skill, issues, etc."></textarea>
         </div>
+      </article>
+
+      <!-- Postmatch -->
+      <article class="card">
+        <h2>Postmatch</h2>
+
+        <div class="login-form-group">
+          <label for="rating">Overall rating</label>
+          <input
+            id="rating"
+            type="range"
+            min="1"
+            max="5"
+            step="1"
+            value="3"
+            class="slider-input"
+          />
+          <span id="rating-display" class="login-meta">3</span>
+        </div>
+
+        <div class="login-form-group">
+          <label for="overall-notes">Notes</label>
+          <textarea id="overall-notes" class="login-input" placeholder="Overall thoughts about this robot in this match."></textarea>
+        </div>
+
+        <div class="login-actions">
+          <button id="scouting-submit-btn" class="btn small" onclick="submitScoutingEntry()">Save entry</button>
+          <span class="login-meta">Entries are sent directly to Google Sheets.</span>
+        </div>
+
+        <p id="save-status" class="muted" style="margin-top:8px;"></p>
       </article>
     </section>
   </main>
@@ -193,123 +281,139 @@
       window.location.href = '../../index.html';
     }
 
-    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxYnmfC-xiQTH85baKS5M_l9QjpgJcOsfQHJwHvY0qkt-eP7SoaiZSwpDFSkh2-FL02/exec';
-
-document.addEventListener('DOMContentLoaded', async () => {
-  const display = document.getElementById('event-name-display');
-
-  try {
-    const res = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
-    if (!res.ok) {
-      throw new Error('HTTP ' + res.status);
+    function adjustCounter(inputId, delta) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+      const current = Number(input.value || 0);
+      const next = Math.max(0, current + delta);
+      input.value = next;
     }
-    const json = await res.json();
-    display.textContent = json.eventKey || '(no event set)';
-  } catch (err) {
-    console.error(err);
-    display.textContent = '(error loading event key)';
-  }
-});
 
-async function submitScoutingEntry() {
-  const status = document.getElementById('save-status');
-  const btn = document.getElementById('scouting-submit-btn');
+    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwonc7XwJ4f8a5Md8sz74C3VGVJLqalcaUVV3jDZIlqh7cmdpUrTPeyijfVkgN38RjTyg/exec';
 
-  // load current event key before submit
-  let eventKey = '';
-  try {
-    const resEvent = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
-    if (resEvent.ok) {
-      const jsonEvent = await resEvent.json();
-      eventKey = jsonEvent.eventKey || '';
-    }
-  } catch (err) {
-    console.error('Error getting event key:', err);
-  }
+    document.addEventListener('DOMContentLoaded', async () => {
+      const display = document.getElementById('event-name-display');
+      const ratingInput = document.getElementById('rating');
+      const ratingDisplay = document.getElementById('rating-display');
 
-  const data = {
-    scouterName: document.getElementById('scouter-name').value,
-    eventName: eventKey,
-    matchNumber: document.getElementById('match-number').value,
-    robotPosition: document.getElementById('robot-position').value,
-    teamNumber: document.getElementById('team-number').value,
-    alliance: document.getElementById('alliance').value,
-    autoStartPos: document.getElementById('auto-start-pos').value,
-    autoPiecesScored: document.getElementById('auto-pieces-scored').value,
-    autoMobility: document.getElementById('auto-mobility').value,
-    autoNotes: document.getElementById('auto-notes').value,
-    teleopPiecesScored: document.getElementById('teleop-pieces-scored').value,
-    defenseLevel: document.getElementById('defense-level').value,
-    penalties: document.getElementById('penalties').value,
-    robotRole: document.getElementById('robot-role').value,
-    endgameResult: document.getElementById('endgame-result').value,
-    teleopNotes: document.getElementById('teleop-notes').value,
-    rating: document.getElementById('rating').value,
-    overallNotes: document.getElementById('overall-notes').value
-  };
+      if (ratingInput && ratingDisplay) {
+        ratingInput.addEventListener('input', () => {
+          ratingDisplay.textContent = ratingInput.value;
+        });
+      }
 
-  if (!data.scouterName || !data.matchNumber || !data.teamNumber || !data.robotPosition) {
-    status.textContent = 'Please fill in scouter, match, team, and robot position.';
-    return;
-  }
-
-  if (Number(data.teamNumber) < 1 || String(data.teamNumber).length > 5) {
-    status.textContent = 'Please check the team number – it looks invalid.';
-    return;
-  }
-
-  status.textContent = 'Submitting entry...';
-  btn.disabled = true;
-
-  try {
-    const params = new URLSearchParams({
-      mode: 'add',
-      scouterName: data.scouterName,
-      eventName: data.eventName,
-      matchNumber: data.matchNumber,
-      robotPosition: data.robotPosition,
-      teamNumber: data.teamNumber,
-      alliance: data.alliance,
-      autoStartPos: data.autoStartPos,
-      autoPiecesScored: data.autoPiecesScored,
-      autoMobility: data.autoMobility,
-      autoNotes: data.autoNotes,
-      teleopPiecesScored: data.teleopPiecesScored,
-      defenseLevel: data.defenseLevel,
-      penalties: data.penalties,
-      robotRole: data.robotRole,
-      endgameResult: data.endgameResult,
-      teleopNotes: data.teleopNotes,
-      rating: data.rating,
-      overallNotes: data.overallNotes
+      try {
+        const res = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+        const json = await res.json();
+        display.textContent = json.eventKey || '(no event set)';
+      } catch (err) {
+        console.error(err);
+        display.textContent = '(error loading event key)';
+      }
     });
 
-    const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
-    if (!res.ok) {
-      throw new Error('HTTP ' + res.status);
-    }
-    const json = await res.json();
+    async function submitScoutingEntry() {
+      const status = document.getElementById('save-status');
+      const btn = document.getElementById('scouting-submit-btn');
 
-    if (json.success) {
-      status.textContent = 'Entry submitted to Google Sheets.';
-      document.getElementById('auto-notes').value = '';
-      document.getElementById('teleop-notes').value = '';
-      document.getElementById('overall-notes').value = '';
+      let eventKey = '';
+      try {
+        const resEvent = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
+        if (resEvent.ok) {
+          const jsonEvent = await resEvent.json();
+          eventKey = jsonEvent.eventKey || '';
+        }
+      } catch (err) {
+        console.error('Error getting event key:', err);
+      }
 
-      setTimeout(() => {
+      const data = {
+        scouterName: document.getElementById('scouter-name').value,
+        eventName: eventKey,
+        matchNumber: document.getElementById('match-number').value,
+        robotPosition: document.getElementById('robot-position').value,
+        teamNumber: document.getElementById('team-number').value,
+        alliance: document.getElementById('alliance').value,
+        autoStartPos: document.getElementById('auto-start-pos').value,
+        autoPiecesScored: document.getElementById('auto-pieces-scored').value,
+        autoMobility: document.getElementById('auto-mobility').value,
+        autoNotes: document.getElementById('auto-notes').value,
+        teleopPiecesScored: document.getElementById('teleop-pieces-scored').value,
+        defenseLevel: document.getElementById('defense-level').value,
+        penalties: document.getElementById('penalties').value,
+        robotRole: document.getElementById('robot-role').value,
+        endgameResult: document.getElementById('endgame-result').value,
+        teleopNotes: document.getElementById('teleop-notes').value,
+        rating: document.getElementById('rating').value,
+        overallNotes: document.getElementById('overall-notes').value,
+        noShow: document.getElementById('no-show').checked ? 'yes' : 'no',
+        mechanicalIssue: document.getElementById('mechanical-issue').checked ? 'yes' : 'no',
+        tippedOver: document.getElementById('tipped-over').checked ? 'yes' : 'no'
+      };
+
+      if (!data.scouterName || !data.matchNumber || !data.teamNumber || !data.robotPosition) {
+        status.textContent = 'Please fill in scouter, match, team, and robot position.';
+        return;
+      }
+
+      if (Number(data.teamNumber) < 1 || String(data.teamNumber).length > 5) {
+        status.textContent = 'Please check the team number – it looks invalid.';
+        return;
+      }
+
+      status.textContent = 'Submitting entry...';
+      btn.disabled = true;
+
+      try {
+        const params = new URLSearchParams({
+          mode: 'add',
+          scouterName: data.scouterName,
+          eventName: data.eventName,
+          matchNumber: data.matchNumber,
+          robotPosition: data.robotPosition,
+          teamNumber: data.teamNumber,
+          alliance: data.alliance,
+          autoStartPos: data.autoStartPos,
+          autoPiecesScored: data.autoPiecesScored,
+          autoMobility: data.autoMobility,
+          autoNotes: data.autoNotes,
+          teleopPiecesScored: data.teleopPiecesScored,
+          defenseLevel: data.defenseLevel,
+          penalties: data.penalties,
+          robotRole: data.robotRole,
+          endgameResult: data.endgameResult,
+          teleopNotes: data.teleopNotes,
+          rating: data.rating,
+          overallNotes: data.overallNotes,
+          noShow: data.noShow,
+          mechanicalIssue: data.mechanicalIssue,
+          tippedOver: data.tippedOver
+        });
+
+        const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+        const json = await res.json();
+
+        if (json.success) {
+          status.textContent = 'Entry submitted to Google Sheets.';
+          document.getElementById('auto-notes').value = '';
+          document.getElementById('teleop-notes').value = '';
+          document.getElementById('overall-notes').value = '';
+        } else {
+          status.textContent = 'Error: ' + (json.error || 'Unknown error');
+        }
+      } catch (err) {
+        console.error('Scouting submit error:', err);
+        status.textContent = 'Error submitting entry: ' + err.message;
+      } finally {
         btn.disabled = false;
-      }, 1000);
-    } else {
-      status.textContent = 'Error: ' + (json.error || 'Unknown error');
-      btn.disabled = false;
+      }
     }
-  } catch (err) {
-    console.error('Scouting submit error:', err);
-    status.textContent = 'Error submitting entry: ' + err.message;
-  } finally {
-    btn.disabled = false;
-  }
-}
   </script>
 </body>
 </html>
