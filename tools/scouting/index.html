@@ -33,6 +33,7 @@
         <a href="../index.html" class="tools-nav-link">Tools home</a>
         <a href="../scouting/index.html" class="tools-nav-link">Scouting</a>
         <a href="../scouting/view.html" class="tools-nav-link">View scouting</a>
+        <a href="../scouting/schedule.html" class="tools-nav-link">Match schedule</a>
         <a href="../inventory/index.html" class="tools-nav-link">Inventory</a>
         <a href="../admin.html" class="tools-nav-link">Admin</a>
       </div>
@@ -53,7 +54,7 @@
     </section>
 
     <section class="page-grid">
-      <!-- Prematch -->
+      <!-- Match & robot info -->
       <article class="card">
         <h2>Match & robot info</h2>
 
@@ -64,12 +65,25 @@
 
         <div class="login-form-group">
           <label for="match-number">Match number</label>
-          <input id="match-number" type="number" class="login-input" min="1" placeholder="e.g., 12" required />
+          <input
+            id="match-number"
+            type="number"
+            class="login-input"
+            min="1"
+            placeholder="e.g., 12"
+            required
+            onchange="autoFillTeamFromSchedule && autoFillTeamFromSchedule()"
+          />
         </div>
 
         <div class="login-form-group">
           <label for="robot-position">Robot position</label>
-          <select id="robot-position" class="login-input" required>
+          <select
+            id="robot-position"
+            class="login-input"
+            required
+            onchange="autoFillTeamFromSchedule && autoFillTeamFromSchedule()"
+          >
             <option value="">Select position</option>
             <option value="R1">Red 1</option>
             <option value="R2">Red 2</option>
@@ -297,7 +311,46 @@
       input.value = next;
     }
 
-    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwonc7XwJ4f8a5Md8sz74C3VGVJLqalcaUVV3jDZIlqh7cmdpUrTPeyijfVkgN38RjTyg/exec';
+    // optional: if you hook this up to MatchSchedule or TBA
+    async function autoFillTeamFromSchedule() {
+      const matchInput = document.getElementById('match-number');
+      const posInput = document.getElementById('robot-position');
+      const teamInput = document.getElementById('team-number');
+      const status = document.getElementById('save-status');
+
+      const matchNumber = Number(matchInput.value || 0);
+      const position = posInput.value;
+
+      if (!matchNumber || !position) {
+        return;
+      }
+
+      try {
+        const params = new URLSearchParams({
+          mode: 'getMatch',
+          matchNumber: matchNumber,
+          robotPosition: position
+        });
+
+        const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+        const json = await res.json();
+
+        if (json.success && json.teamNumber) {
+          teamInput.value = json.teamNumber;
+          status.textContent = 'Team auto-filled from match schedule.';
+        } else {
+          status.textContent = 'No team found for that match/position.';
+        }
+      } catch (err) {
+        console.error('Match schedule error:', err);
+        status.textContent = 'Error loading match schedule.';
+      }
+    }
+
+    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwYTcI2EBI243ldjIbZV2UBJFtSj3R4KvAu54Sror8_C34mcptRbaSrx2JN-G3SJuTZyg/exec';
 
     document.addEventListener('DOMContentLoaded', async () => {
       const display = document.getElementById('event-name-display');
@@ -327,6 +380,7 @@
       const status = document.getElementById('save-status');
       const btn = document.getElementById('scouting-submit-btn');
 
+      // load current event key before submit
       let eventKey = '';
       try {
         const resEvent = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');

@@ -41,25 +41,34 @@
 
   <main class="login-page">
     <section class="login-card">
-      <h1>Admin settings</h1>
-      <p>Configure event settings used by the scouting tools.</p>
+      <article class="card">
+        <h2>Event settings</h2>
 
-      <div class="login-form-group">
-        <label for="event-name-admin">Current event name</label>
-        <input
-          id="event-name-admin"
-          type="text"
-          class="login-input"
-          placeholder="e.g., 2026 XYZ Regional"
-        />
-      </div>
+        <div class="login-form-group">
+          <label for="event-key">Internal event key (for scouting)</label>
+          <input
+            id="event-key"
+            type="text"
+            class="login-input"
+            placeholder="e.g., 2026-teamtiger-event"
+          />
+        </div>
 
-      <div class="login-actions">
-        <button class="btn small" onclick="saveCurrentEvent()">Save event</button>
-        <span class="login-meta">This event name will appear on the scouting form.</span>
-      </div>
+        <div class="login-form-group">
+          <label for="tba-event-key">TBA event key</label>
+          <input
+            id="tba-event-key"
+            type="text"
+            class="login-input"
+            placeholder="e.g., 2026txhou"
+          />
+        </div>
 
-      <p id="event-save-status" class="muted" style="margin-top:8px;"></p>
+        <div class="login-actions">
+          <button class="btn small" onclick="saveEventSettings()">Save settings</button>
+          <span class="login-meta" id="event-settings-status"></span>
+        </div>
+      </article>
     </section>
   </main>
 
@@ -68,60 +77,77 @@
   </footer>
 
   <script>
+    // Require tools login
     if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
       window.location.href = 'login.html';
     }
 
-    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwonc7XwJ4f8a5Md8sz74C3VGVJLqalcaUVV3jDZIlqh7cmdpUrTPeyijfVkgN38RjTyg/exec';
+    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwYTcI2EBI243ldjIbZV2UBJFtSj3R4KvAu54Sror8_C34mcptRbaSrx2JN-G3SJuTZyg/exec';
 
-    async function saveCurrentEvent() {
-    const input = document.getElementById('event-name-admin');
-    const status = document.getElementById('event-save-status');
-    const value = input.value.trim();
+    async function saveEventSettings() {
+      const internalInput = document.getElementById('event-key');
+      const tbaInput = document.getElementById('tba-event-key');
+      const status = document.getElementById('event-settings-status');
 
-    if (!value) {
-        status.textContent = 'Please enter an event name.';
+      const internalKey = internalInput.value.trim();
+      const tbaKey = tbaInput.value.trim();
+
+      if (!internalKey && !tbaKey) {
+        status.textContent = 'Please enter at least one key to save.';
         return;
-    }
+      }
 
-    try {
+      status.textContent = 'Saving settings…';
+
+      try {
         const params = new URLSearchParams({
-        mode: 'setEvent',
-        eventKey: value
+          mode: 'setEvent',
+          eventKey: internalKey,
+          tbaEventKey: tbaKey
         });
-          const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
+
+        const res = await fetch(SCOUTING_BACKEND_URL + '?' + params.toString());
         if (!res.ok) {
           throw new Error('HTTP ' + res.status);
         }
-          const json = await res.json();
+        const json = await res.json();
+
         if (json.success) {
-          status.textContent = 'Event key saved: ' + json.eventKey;
+          status.textContent = 'Event settings saved.';
         } else {
           status.textContent = 'Error: ' + (json.error || 'Unknown error');
         }
-    } catch (err) {
-        console.error(err);
-        status.textContent = 'Error saving event key: ' + err.message;
+      } catch (err) {
+        console.error('Save event settings error:', err);
+        status.textContent = 'Error saving settings: ' + err.message;
       }
-      }
+    }
 
-      document.addEventListener('DOMContentLoaded', async () => {
-      const input = document.getElementById('event-name-admin');
-      const status = document.getElementById('event-save-status');
+    // Load current internal + TBA event keys
+    document.addEventListener('DOMContentLoaded', async () => {
+      const internalInput = document.getElementById('event-key');
+      const tbaInput = document.getElementById('tba-event-key');
+      const status = document.getElementById('event-settings-status');
 
       try {
-        const res = await fetch(SCOUTING_BACKEND_URL + '?mode=getEvent');
+        // getSettings should return both A2 (internal) and B2 (TBA)
+        const res = await fetch(SCOUTING_BACKEND_URL + '?mode=getSettings');
         if (!res.ok) {
-        throw new Error('HTTP ' + res.status);
+          throw new Error('HTTP ' + res.status);
         }
         const json = await res.json();
-        input.value = json.eventKey || '';
-        if (json.eventKey) {
-        status.textContent = 'Current event key: ' + json.eventKey;
+
+        internalInput.value = json.eventKey || '';
+        tbaInput.value = json.tbaEventKey || '';
+
+        if (json.eventKey || json.tbaEventKey) {
+          status.textContent =
+            'Current internal: ' + (json.eventKey || '(none)') +
+            ' | TBA: ' + (json.tbaEventKey || '(none)');
         }
       } catch (err) {
-        console.error(err);
-        status.textContent = 'Error loading current event key.';
+        console.error('Error loading event settings:', err);
+        status.textContent = 'Error loading event settings.';
       }
     });
   </script>
