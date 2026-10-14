@@ -131,7 +131,7 @@
       statusEl.textContent = 'Loading scouting data...';
 
       try {
-        const res = await fetch(BACKEND_URL + '?mode=list');
+        const res = await fetch(SCOUTING_BACKEND_URL + '?mode=list');
         if (!res.ok) {
           throw new Error('HTTP ' + res.status);
         }
