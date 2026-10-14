@@ -293,7 +293,7 @@
     <p>© 2024 Team Tiger 9551</p>
   </footer>
 
-  <script>
+  <script src="../config.js">
     if (localStorage.getItem('teamTigerToolsAccess') !== 'true') {
       window.location.href = '../login.html';
     }
@@ -350,8 +350,9 @@
       }
     }
 
-    const SCOUTING_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwYTcI2EBI243ldjIbZV2UBJFtSj3R4KvAu54Sror8_C34mcptRbaSrx2JN-G3SJuTZyg/exec';
-
+    const SCOUTING_BACKEND_URL =
+      window.TEAM_TIGER_CONFIG.SCOUTING_BACKEND_URL;
+      
     document.addEventListener('DOMContentLoaded', async () => {
       const display = document.getElementById('event-name-display');
       const ratingInput = document.getElementById('rating');
