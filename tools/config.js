@@ -1,4 +1,4 @@
 window.TEAM_TIGER_CONFIG = {
     SCOUTING_BACKEND_URL:
-        'https://script.google.com/macros/s/AKfycbwonc7XwJ4f8a5Md8sz74C3VGVJLqalcaUVV3jDZIlqh7cmdpUrTPeyijfVkgN38RjTyg/exec'
+        'https://script.google.com/macros/s/AKfycbyYWOmLp1mF2uJgAbyg3Hz4QxR2W-grx008S7G0UIE8yn9V3MWfhDfdkfoshGdSqdd-vw/exec'
 };
